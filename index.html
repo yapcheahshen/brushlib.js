@@ -1,0 +1,190 @@
+<HTML>
+<SCRIPT src="mybrush.js"></SCRIPT>
+<SCRIPT src="brushes/charcoal.myb.js"></SCRIPT>
+
+<!--
+Wacom Browser Plugin can be download from 
+http://www.wacom.com/CustomerCare/Plugin.aspx
+
+//-->
+<SCRIPT>
+  var surface,brush, brushname="charcoal";
+  var t1;//timer
+  var canvas;
+  var canvasPos = {x:0.0, y:0.0};
+  var lastX = 0.0;
+  var lastY = 0.0;
+  var iPad = navigator.userAgent.match(/iPad/i) != null;
+  function findPos(obj) 
+  {
+		var curleft = curtop = 0;
+		if (obj.offsetParent) {
+			curleft = obj.offsetLeft
+			curtop = obj.offsetTop
+			while (obj = obj.offsetParent) {
+				curleft += obj.offsetLeft
+				curtop += obj.offsetTop
+			}
+		}
+		return {x:curleft, y:curtop};
+  }
+
+	  
+
+  function onLoad()
+  { 
+		if ( null != document.getElementById('NotSupported') )
+		{
+			alert("Many apologies.  This demo is not supported on Internet Explorer. Please try Firefox!");
+			return;
+		}
+       	canvas = document.getElementById('thecanvas');
+		canvasPos = findPos(canvas);
+        surface=new MypaintSurface("thecanvas");
+		brush=new MypaintBrush(charcoal);  
+		updateui(charcoal);
+		
+        canvas.addEventListener( "touchmove", mousedrag, false );
+        canvas.addEventListener( "touchstart", mousedown, false );
+        canvas.addEventListener( "touchend", mouseup, false );		
+  }
+
+function mousedown(evt)
+{
+  if (iPad) {
+        var te =  evt.touches.item(0);
+        lastX = te.clientX - canvasPos.x;
+        lastY = te.clientY - canvasPos.y;  
+        thecanvas.touchmove=mousedrag;
+  } else {
+		thecanvas.onmousemove=mousedrag;
+		lastX = evt.clientX - canvasPos.x;
+		lastY = evt.clientY - canvasPos.y;
+  }
+        t1=(new Date()).getTime();		
+		brush.new_stroke(lastX,lastY);
+		mousedrag(evt);
+		document.getElementById('divelapse').innerHTML="X:"+lastX+" y:"+lastY;
+}
+function mouseup(evt)
+{
+  	canvas.onmousemove=null;
+  	updatestatus();
+}
+function mousemove(evt)
+{
+ //  console.log(evt.clientX+' '+evt.clientY);
+}
+function mousedrag(evt)
+{
+		var plugin = document.embeds["wacom-plugin"];
+		var pressure;
+		var isEraser;
+		
+		var mousepressure=document.getElementById("mousepressure").value;
+		if (plugin)	{
+			pressure = plugin.pressure;
+			isEraser = plugin.isEraser;
+			if (pressure==0) pressure=mousepressure /100; //for mouse
+		}else{
+			pressure = 1.0;
+			isEraser = false;
+		}
+       if (iPad) {
+          var te =  evt.touches.item(0);
+          curX = te.clientX - canvasPos.x;
+          curY = te.clientY - canvasPos.y;  
+          evt.preventDefault();
+          pressure = mousepressure /100;
+          isEraser=false;
+        } else {
+		  curX = evt.clientX - canvasPos.x;
+		  curY = evt.clientY - canvasPos.y;
+		}
+document.getElementById('divelapse').innerHTML="X:"+curX+" y:"+curY;
+        brush.stroke_to(surface,curX, curY, pressure, 90,0 , ((new Date()).getTime() - t1)/1000);
+		lastX = curX;
+		lastY = curY;
+}
+function updatestatus()
+{
+  
+  //how many dab is drawn for this stroke ?
+  document.getElementById('dab_count').innerHTML = surface.dab_count;
+  //how may calls to getcolor ?
+  document.getElementById('getcolor_count').innerHTML = surface.getcolor_count;
+  //time elpase for this stroke
+  document.getElementById('divelapse').innerHTML=(new Date()).getTime() - t1;
+  
+}
+function updateui(brushsetting)
+{
+  var color_h=document.getElementById("color_h");
+  var color_s=document.getElementById("color_s");
+  var color_v=document.getElementById("color_v");
+  
+  color_h.value=brushsetting.color_h.base_value *100;
+  color_s.value=brushsetting.color_s.base_value *100;
+  color_v.value=brushsetting.color_v.base_value *100;
+  
+  document.getElementById("colorbox").innerHTML=brushname;
+
+  colorchanged();
+}
+function colorchanged()
+{
+  var color_h=document.getElementById("color_h");
+  var color_s=document.getElementById("color_s");
+  var color_v=document.getElementById("color_v");
+  var bs=window[brushname];
+  bs.color_h.base_value=color_h.value / 100;
+  bs.color_s.base_value=color_s.value / 100;
+  bs.color_v.base_value=color_v.value / 100;
+  brush.readmyb_json(bs);
+  
+  var colorhsv=new ColorHSV(bs.color_h.base_value,bs.color_s.base_value,bs.color_v.base_value);
+  colorhsv.hsv_to_rgb_float();
+  
+  var colorbox=document.getElementById('colorbox');
+  var rr=Math.floor(colorhsv.r *255).toString(16); if (rr.length<2) rr="0"+rr;
+  var gg=Math.floor(colorhsv.g *255).toString(16); if (gg.length<2) gg="0"+gg;
+  var bb=Math.floor(colorhsv.b *255).toString(16); if (gg.length<2) gg="0"+gg;
+  colorbox.style.backgroundColor='#'+rr+gg+bb;
+  
+}
+function selectbrush()
+{
+   var bsel=document.getElementById("brushselector");
+   brushname=bsel.options[bsel.selectedIndex].value;
+
+   var script=document.createElement('script');
+   script.setAttribute('src','brushes/'+brushname+'.myb.js');
+   script.setAttribute('id','brushscript');
+   document.documentElement.firstChild.appendChild(script);       
+   var loadbrush="brush=new MypaintBrush("+brushname+"); updateui("+brushname+")";
+   setTimeout(loadbrush, 100);
+   
+}
+</SCRIPT>
+<BODY onload="onLoad();" bgcolor=silver>
+<CANVAS width=800 height=500 id=thecanvas onmousemove="mousemove(event)" onmousedown="mousedown(event)" onmouseup="mouseup(event)"></CANVAS>
+<embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
+<br/>Brushes:<select id="brushselector" onchange="selectbrush()">
+<option value="charcoal">CharCoal</option>
+<option value="pen">Pen</option>
+<option value="calligraphy">Calligraphy</option>
+<option value="sewing">Sewing</option>
+<option value="short_grass">Short grass</option>
+</select>
+<br/>Pressure for Mouse: <input type="range" id="mousepressure" min="1" max="100" value="75"/>1.0
+<br/><span id="colorbox">&nsbp;&nsbp;</span>
+<br/>Hue: <input type="range" id="color_h" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+<br/>Sat: <input type="range" id="color_s" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+<br/>Vue: <input type="range" id="color_v" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+
+<br>dabs:<span id="dab_count"></span>
+<br>getcolor:<span id="getcolor_count"></span>
+<br>elapse:<span id="divelapse"></span>
+
+</BODY>
+</HTML>
