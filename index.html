@@ -1,4 +1,5 @@
 <HTML>
+
 <SCRIPT src="mybrush.js"></SCRIPT>
 <SCRIPT src="brushes/charcoal.myb.js"></SCRIPT>
 
@@ -152,6 +153,7 @@ function colorchanged()
   colorbox.style.backgroundColor='#'+rr+gg+bb;
   
 }
+
 function selectbrush()
 {
    var bsel=document.getElementById("brushselector");
@@ -162,12 +164,12 @@ function selectbrush()
    script.setAttribute('id','brushscript');
    document.documentElement.firstChild.appendChild(script);       
    var loadbrush="brush=new MypaintBrush("+brushname+"); updateui("+brushname+")";
-   setTimeout(loadbrush, 100);
-   
+   setTimeout(loadbrush, 1000);   //wait for one second to load the script
 }
 </SCRIPT>
 <BODY onload="onLoad();" bgcolor=silver>
 <CANVAS width=800 height=500 id=thecanvas onmousemove="mousemove(event)" onmousedown="mousedown(event)" onmouseup="mouseup(event)"></CANVAS>
+<br/><a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
 <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
 <br/>Brushes:<select id="brushselector" onchange="selectbrush()">
 <option value="charcoal">CharCoal</option>
