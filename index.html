@@ -86,9 +86,10 @@ function mousedrag(evt)
 		if (plugin)	{
 			pressure = plugin.pressure;
 			isEraser = plugin.isEraser;
-			if (pressure==0) pressure=mousepressure /100; //for mouse
+			if (isEraser==undefined) isEraser=false;
+			if (pressure==undefined || pressure==0) pressure=mousepressure /100; //for mouse
 		}else{
-			pressure = 1.0;
+			pressure = pressure=mousepressure /100; //for mouse
 			isEraser = false;
 		}
        if (iPad) {
