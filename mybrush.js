@@ -22,6 +22,8 @@
 	http://wiki.mypaint.info/Brushlib
 	
 	Author: Yap Cheah Shen  yapcheahshen@gmail.com
+	online demo: http://69.163.40.159/mypaint/brushlib/javascript/
+	source code: https://github.com/yapcheahshen/brushlib.js
 	
 	Date:  2011/9/27
 	Licence: same as original version of brushlib in C++
