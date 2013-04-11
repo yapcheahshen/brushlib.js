@@ -8,7 +8,7 @@ Ported from
 Author: Yap Cheah Shen  yapcheahshen@gmail.com
 
 Online demo:
-http://69.163.40.159/mypaint/brushlib/javascript/
+http://www.ksana.tw/mypaint/
 
 Wacom Browser Plugin can be download from 
 http://www.wacom.com/CustomerCare/Plugin.aspx
