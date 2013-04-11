@@ -22,7 +22,7 @@
 	http://wiki.mypaint.info/Brushlib
 	
 	Author: Yap Cheah Shen  yapcheahshen@gmail.com
-	online demo: http://69.163.40.159/mypaint/brushlib/javascript/
+	online demo: http://www.ksana.tw/mypaint/
 	source code: https://github.com/yapcheahshen/brushlib.js
 	
 	Date:  2011/9/27
